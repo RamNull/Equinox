@@ -9,7 +9,7 @@ import copy
 app = Flask(__name__)
 
 # Set your OpenAI API key
-openai.api_key = 'sk-proj-Joi94rOX8sO4gDRrhHAJT3BlbkFJVdnHwxEcyUMtLlEKq2BZ'
+openai.api_key = 'add your api key hear'
 
 UPLOAD_FOLDER = 'uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
