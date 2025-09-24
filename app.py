@@ -234,8 +234,9 @@ def generate_using_session():
         return jsonify(update_resopnse)
     except Exception as e:
         return jsonify({
-            "generated_text": generated_text
-        })
+            "error": "Failed to generate text",
+            "generated_text": ""
+        }), 500
 
 
 ## end Session 
@@ -243,14 +244,14 @@ def generate_using_session():
 def get_history(session_id):
     if session_id in context_storage:
         storage_history = context_storage[session_id]
-        storage_history.replace('\n','')
+        storage_history = storage_history.replace('\n','')
         storage_history = '{'+storage_history+'}'   
-    try:
-        return jsonify(  json.loads(storage_history))
-    except Exception as e:
-        return jsonify({
-            "storage_history":storage_history
-        })
+        try:
+            return jsonify(json.loads(storage_history))
+        except Exception as e:
+            return jsonify({
+                "storage_history": storage_history
+            })
     else:
         return jsonify({"error": "Invalid session ID"}), 400
     

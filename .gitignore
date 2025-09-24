@@ -120,6 +120,18 @@ ENV/
 env.bak/
 venv.bak/
 
+# Application-specific
+uploads/
+test_uploads/
+*.db
+*.sqlite
+
+# API Keys and Secrets (CRITICAL - NEVER COMMIT)
+.env.local
+.env.production
+config.local.py
+secrets.json
+
 # Spyder project settings
 .spyderproject
 .spyproject

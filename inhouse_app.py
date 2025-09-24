@@ -35,7 +35,11 @@ def upload_data():
                 vector = text_to_vector(text)
                 try:
                     entry_id = str(uuid.uuid4())
-                    collection.add(entry_id, vector, {"text": text})
+                    collection.add(
+                        ids=[entry_id],
+                        embeddings=[vector],
+                        metadatas=[{"text": text}]
+                    )
                     stored_ids.append(entry_id)
                 except Exception as e:
                     return jsonify({"error": str(e)}), 500
@@ -50,7 +54,7 @@ def retrieve_data():
         if query_text:
             query_vector = text_to_vector(query_text)
             try:
-                results = collection.query(query_vector,n_results=5)  # Adjust `top_k` as needed
+                results = collection.query(query_embeddings=[query_vector], n_results=5)
             except Exception as e:
                     return jsonify({"error": str(e)}), 500
             # Construct a response with score and metadata
@@ -66,17 +70,18 @@ session['history'] = []
 
 @app.route('/chat', methods=['POST'])
 def chat():
-
     data = request.get_json()
-    user_message = data.get('message',None)
+    user_message = data.get('message', None)
     model = data.get('model')
-    user_vector = data.get('vector',True)
+    user_vector = data.get('vector', True)
+    
+    if not user_message:
+        return jsonify({'error': 'No message provided'}), 400
+    
     if user_vector:
         croma_data = query_croma(user_message)
-        if not user_message:
-            return jsonify({'error': 'No message provided'}), 400
-
         user_message = f"{user_message}\n\nRelevant information: {croma_data}"
+    
     session['history'].append({"role": "user", "content": user_message})
     try:
         # Connect to OpenAI and get a response
@@ -103,7 +108,7 @@ def query_croma(query_text):
             query_vector = text_to_vector(query_text)
             try:
                 print("start query")
-                results = collection.query(query_vector,n_results=5)  # Adjust `top_k` as needed
+                results = collection.query(query_embeddings=[query_vector], n_results=5)
                 print(results)
                 print("end query")
             except Exception as e:
